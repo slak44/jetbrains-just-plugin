@@ -1,6 +1,7 @@
 package org.mvnsearch.plugins.just
 
 import com.intellij.execution.configurations.PathEnvironmentVariableUtil
+import com.intellij.ide.impl.isTrusted
 import com.intellij.openapi.application.PathMacros
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.guessProjectDir
@@ -16,6 +17,7 @@ val JUSTFILES_MARKDOWN = listOf("README.md", "AGENTS.md", "CLAUDE.md")
 private const val MAX_MARKDOWN_SIZE = 1024 * 1024
 
 object Just {
+    @Suppress("UnstableApiUsage")
     fun getJustCmdAbsolutionPath(project: Project): String {
         // environment variable
         EnvironmentUtil.getValue("JUST_EXECUTABLE")?.takeIf { it.isNotBlank() }?.let {
@@ -25,8 +27,10 @@ object Just {
         PathMacros.getInstance().getValue("JUST_EXECUTABLE")?.takeIf { it.isNotBlank() }?.let {
             return it
         }
-        project.guessProjectDir()?.let { projectDir ->
-            projectDir.findFileByRelativePath(".devenv/profile/bin/just")?.let { return it.path }
+        if (project.isTrusted()) {
+            project.guessProjectDir()?.let { projectDir ->
+                projectDir.findFileByRelativePath(".devenv/profile/bin/just")?.let { return it.path }
+            }
         }
         val userHome = Path(System.getProperty("user.home"))
         val justExecName = if (SystemInfo.isWindows) "just.exe" else "just"

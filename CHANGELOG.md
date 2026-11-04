@@ -4,6 +4,10 @@
 
 ## Unreleased
 
+### Fixed
+
+- Use `.devenv/profile/bin/just` only in trusted projects
+
 ## 0.6.57 - 2026-11-04
 
 ### Fixed
